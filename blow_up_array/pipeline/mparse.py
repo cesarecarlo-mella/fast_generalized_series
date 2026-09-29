@@ -192,17 +192,23 @@ class Parser:
 
     def expr(self):
         if self.peek() == ('o', '-'):
-            self.take(); r = self.term(); r = {k: -v for k, v in r.items()}
+            self.take(); r = {k: -v for k, v in self.term().items()}
         else:
             if self.peek() == ('o', '+'):
                 self.take()
-            r = self.term()
+            r = dict(self.term())
+        # accumulate IN PLACE (padd copies its argument: quadratic for long sums)
         while True:
             t = self.peek()
-            if t == ('o', '+'):
-                self.take(); r = padd(r, self.term())
-            elif t == ('o', '-'):
-                self.take(); r = padd(r, self.term(), -1)
+            if t == ('o', '+') or t == ('o', '-'):
+                self.take()
+                neg = t[1] == '-'
+                for k, v in self.term().items():
+                    nv = r.get(k, 0) + (-v if neg else v)
+                    if nv:
+                        r[k] = nv
+                    else:
+                        r.pop(k, None)
             else:
                 return r
 

@@ -1,0 +1,1 @@
+<|"point" -> {x -> 1/2, y -> 0}, "expansion" -> "x = 1/2 + t, y = y (no blow-up)", "corner" -> 0, "ORDt" -> 20, "ORDy" -> 20, "active" -> {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 16}, "maxReldiff" -> 2.56e-19|>
