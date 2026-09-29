@@ -1,0 +1,55 @@
+[load c1] 371 comps, letters ['l[1]', 'l[2]', 'l[3]', 'l[4]', 'l[5]', 'l[6]', 'l[7]', 'l[8]', 'l[9]', 'l[10]', 'l[11]', 'l[12]', 'l[13]', 'l[16]'], parsed in 3.3s
+[run] corner 1  order (10,30)  weights 1..6  load 3.4s
+  prime 4194301: w1 0.7s  w2 1.1s  w3 2.6s  w4 8.6s  w5 16.7s  w6 28.6s
+  prime 4194287: w1 0.7s  w2 1.2s  w3 2.5s  w4 8.4s  w5 16.9s  w6 28.8s
+  prime 4194271: w1 0.5s  w2 1.2s  w3 2.9s  w4 8.4s  w5 16.3s  w6 28.0s
+  prime 4194277: w1 0.6s  w2 1.2s  w3 3.0s  w4 8.3s  w5 16.0s  w6 29.0s
+  prime 4194217: w1 0.4s  w2 1.3s  w3 2.7s  w4 7.4s  w5 15.1s  w6 25.6s
+  prime 4194247: w1 0.4s  w2 1.3s  w3 2.9s  w4 7.4s  w5 15.8s  w6 25.3s
+  prime 4194191: w1 0.4s  w2 1.2s  w3 2.8s  w4 7.3s  w5 16.7s  w6 28.3s
+  prime 4194199: w1 0.4s  w2 1.0s  w3 2.6s  w4 7.3s  w5 16.8s  w6 29.1s
+  prime 4194187: w1 0.7s  w2 1.8s  w3 4.0s  w4 8.4s  w5 16.6s  w6 28.0s
+  prime 4194181: w1 0.8s  w2 1.7s  w3 3.9s  w4 8.1s  w5 16.7s  w6 28.0s
+  prime 4194173: w1 0.6s  w2 1.3s  w3 2.7s  w4 7.3s  w5 15.2s  w6 26.1s
+  prime 4194167: w1 0.6s  w2 1.3s  w3 2.6s  w4 7.1s  w5 15.4s  w6 26.7s
+  prime 4194143: w1 0.5s  w2 1.2s  w3 3.0s  w4 7.2s  w5 14.5s  w6 25.5s
+  prime 4194137: w1 0.5s  w2 1.4s  w3 2.7s  w4 6.9s  w5 14.7s  w6 25.7s
+  prime 4194131: w1 0.5s  w2 1.1s  w3 2.7s  w4 7.0s  w5 15.1s  w6 25.1s
+  prime 4194107: w1 0.5s  w2 1.4s  w3 2.5s  w4 7.3s  w5 14.8s  w6 25.1s
+  prime 4194103: w1 0.6s  w2 1.3s  w3 2.8s  w4 7.3s  w5 16.1s  w6 26.3s
+  prime 4194023: w1 0.6s  w2 1.2s  w3 2.6s  w4 7.2s  w5 16.7s  w6 26.0s
+  prime 4194011: w1 0.5s  w2 1.2s  w3 3.5s  w4 7.8s  w5 15.1s  w6 30.2s
+  prime 4194007: w1 0.5s  w2 1.6s  w3 3.5s  w4 7.8s  w5 15.7s  w6 30.2s
+  reconstruct w1 with 18(+2) primes: 21895 coefficients, 0 via common denominator, 0 unverified
+  reconstruct w2 with 18(+2) primes: 84551 coefficients, 0 via common denominator, 0 unverified
+  reconstruct w3 with 18(+2) primes: 323810 coefficients, 0 via common denominator, 0 unverified
+  reconstruct w4 with 18(+2) primes: 793351 coefficients, 0 via common denominator, 0 unverified
+  reconstruct w5 with 18(+2) primes: 1580248 coefficients, 0 via common denominator, 0 unverified
+  reconstruct w6 with 18(+2) primes: 2757941 coefficients, 541 via common denominator, 363 unverified
+  -> weights [6] need more primes, adding 6
+  prime 4193977: w1 0.5s  w2 1.2s  w3 2.9s  w4 7.6s  w5 14.9s  w6 26.3s
+  prime 4193971: w1 0.5s  w2 1.2s  w3 2.8s  w4 7.8s  w5 15.0s  w6 26.4s
+  prime 4193957: w1 0.5s  w2 1.2s  w3 2.7s  w4 7.7s  w5 15.4s  w6 26.8s
+  prime 4193963: w1 0.5s  w2 1.1s  w3 2.7s  w4 8.2s  w5 16.0s  w6 27.0s
+  prime 4193939: w1 0.5s  w2 1.3s  w3 2.7s  w4 8.2s  w5 16.4s  w6 25.8s
+  prime 4193929: w1 0.4s  w2 1.3s  w3 2.6s  w4 8.3s  w5 16.3s  w6 26.2s
+  reconstruct w6 with 24(+2) primes: 2758304 coefficients, 0 via common denominator, 0 unverified
+
+=== TIMING (corner 1, order 10/30, 26 primes of 22 bits) ===
+  load/parse inputs          : 3.4s
+  weight 1 :   0.54s per prime  x 26 primes =    14.1s CPU   (verified with 20 primes)
+  weight 2 :   1.28s per prime  x 26 primes =    33.2s CPU   (verified with 20 primes)
+  weight 3 :   2.88s per prime  x 26 primes =    74.8s CPU   (verified with 20 primes)
+  weight 4 :   7.69s per prime  x 26 primes =   200.0s CPU   (verified with 20 primes)
+  weight 5 :  15.79s per prime  x 26 primes =   410.4s CPU   (verified with 20 primes)
+  weight 6 :  27.09s per prime  x 26 primes =   704.2s CPU   (verified with 26 primes)
+  recursion CPU total        : 1436.7s   (wall 727.1s on 2 jobs)
+  reconstruction             : 215.5s
+  TOTAL wall                 : 945.9s
+
+=== PHYSICAL-VARIABLE COMPARISON vs /mnt/user-data/uploads/series.all/cluster_results/blow_up_form_2_order_20/out  (window SMALL<=10, BIG<=10) ===
+  w1: ref 11519 coeffs (11723/41803 terms in window), mine 11519 | missing 0, extra 0, different 0 | bad comps [] (1s)
+  w2: ref 41026 coeffs (41162/146242 terms in window), mine 41026 | missing 0, extra 0, different 0 | bad comps [] (4s)
+  w3: ref 152594 coeffs (152653/558463 terms in window), mine 152594 | missing 0, extra 0, different 0 | bad comps [] (15s)
+  w4: ref 379148 coeffs (379174/1392642 terms in window), mine 379148 | missing 0, extra 0, different 0 | bad comps [] (43s)
+  w5: ref 761341 coeffs (761346/2802199 terms in window), mine 761341 | missing 0, extra 0, different 0 | bad comps [] (92s)
