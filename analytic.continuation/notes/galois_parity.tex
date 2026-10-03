@@ -1,0 +1,116 @@
+\documentclass[11pt]{article}
+\usepackage[a4paper,margin=2.6cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{hyperref}
+\newtheorem{prop}{Proposition}
+\newcommand{\dd}{\mathrm{d}}
+\title{The sign of $\sqrt{xyz}$ as a Galois ($\mathbb{Z}_2$) symmetry\\ of the canonical differential equation}
+\author{Notes for the H family (3L1M), analytic continuation to $x,y<0$}
+\date{3 October 2026}
+\begin{document}
+\maketitle
+
+\section{Setup}
+The masters $\vec g(x,y;\epsilon)$ of the H family ($N_f=371$) satisfy a canonical
+differential equation
+\begin{equation}
+  \dd \vec g = \epsilon\, \dd A\, \vec g ,\qquad
+  A = \sum_{k} a_k \log l_k(x,y), \qquad a_k\in\mathbb{Q}^{N_f\times N_f},
+\end{equation}
+with $\vec g = \sum_{w\ge0} \epsilon^w \vec g^{(w)}$. The alphabet contains one square root,
+\begin{equation}
+  r=\sqrt{b},\qquad b = x\,y\,z,\qquad z = 1-x-y ,
+\end{equation}
+and lives in the quadratic field extension $K(r)$ of $K=\mathbb{Q}(x,y)$.
+The letters split into two classes:
+\begin{itemize}
+\item \emph{even} (rational) letters $l_1,\dots,l_6,l_9,\dots,l_{20}\in K$;
+\item \emph{odd} letters
+\begin{equation}
+  l_7=\frac{x z - i r}{x z + i r},\qquad l_8=\frac{x y - i r}{x y + i r}.
+\end{equation}
+\end{itemize}
+
+\section{The Galois action}
+$\mathrm{Gal}(K(r)/K)=\{1,\sigma\}$ with $\sigma: r\mapsto -r$. On the letters,
+\begin{equation}
+  \sigma(l_k)=l_k \ (\text{even}),\qquad \sigma(l_{7,8}) = l_{7,8}^{-1}
+  \;\Rightarrow\; \sigma(\dd\log l_{7,8}) = -\dd\log l_{7,8} .
+\end{equation}
+Choosing the sign of $r$ at a point (e.g.\ after an analytic continuation) is choosing
+between $1$ and $\sigma$.
+
+The masters split in the same way. In H the only masters normalized with a square-root
+prefactor are $g_{156}, g_{157}$ (``odd''); all others are ``even''. Write
+$P=\mathrm{diag}(1,\dots,1,-1,-1,1,\dots,1)$ with $-1$ on the odd masters.
+
+\section{Parity structure of the connection}
+Write $A$ in even/odd blocks,
+\begin{equation}
+  A=\begin{pmatrix} A_{ee} & A_{eo}\\ A_{oe} & A_{oo}\end{pmatrix}.
+\end{equation}
+The DE is \emph{graded}: the diagonal blocks contain only even letters, and the off-diagonal
+blocks contain only odd letters. For H this was checked entry by entry on
+\texttt{H\_atilde}: every one of the 134 nonzero odd$\leftrightarrow$even entries contains only
+$l_7,l_8$, and $l_7,l_8$ appear nowhere else. Equivalently,
+\begin{equation}
+  \sigma(A) = P\,A\,P .
+  \label{eq:cov}
+\end{equation}
+Note that the odd--odd entries (e.g.\ $A_{156,156}$) do \emph{not} change sign: they multiply an
+odd master and contribute to the derivative of an odd master, so the two signs cancel.
+
+\section{Consequence}
+\begin{prop}
+Let $\vec g$ solve $\dd\vec g=\epsilon\,\dd A\,\vec g$ with boundary value $\vec g_0$. Then
+$P\vec g$ solves the Galois-conjugate equation $\dd\vec g'=\epsilon\,\dd\sigma(A)\,\vec g'$
+with boundary value $P\vec g_0$. If the odd boundary constants vanish, $P\vec g_0=\vec g_0$,
+so the solution of the conjugate equation with the same boundary data is $P\vec g$:
+\begin{equation}
+  g_e\ \text{unchanged},\qquad g_{156},\,g_{157}\ \to\ -g_{156},\,-g_{157}.
+\end{equation}
+\end{prop}
+\begin{proof}
+$\dd(P\vec g)=\epsilon\,P\,\dd A\,\vec g=\epsilon\,(P\,\dd A\,P)(P\vec g)=\epsilon\,\dd\sigma(A)\,(P\vec g)$,
+using $P^2=1$ and \eqref{eq:cov}.
+\end{proof}
+Block by block:
+\begin{align}
+  \dd g_e &= \epsilon\,(\dd A_{ee}\, g_e + \dd A_{eo}\, g_o), &
+  \dd(-g_o) &= \epsilon\,(\dd A_{oo}\,(-g_o) + (-\dd A_{oe})\, g_e),
+\end{align}
+i.e.\ in the even rows the flipped odd letter multiplies the flipped odd master, and the odd
+rows are the original equation times $-1$.
+
+\paragraph{Symbol-level statement.} Since $g^{(w)}=\int \dd A\, g^{(w-1)} + c^{(w)}$ and the odd
+constants $c^{(w)}_{o}$ vanish (including weight 0), induction on the weight shows that every
+term in the symbol (iterated integral) of an even master contains an even number of odd
+letters, and every term of an odd master an odd number. Under $\sigma$, odd masters are odd and even masters are invariant;
+the masters are Galois eigenvectors with eigenvalue $\pm1$.
+
+\section{Application to the continued region}
+In the chart $x=-w/v$, $y=-u/v$, $z=1/v$ ($u+w+v=1$), which covers $x,y<0$, $z>1$, one has
+$xyz = uw/v^3>0$, so $r$ is real, but its sign is a choice. For H:
+\begin{itemize}
+\item the boundary constants of $g_{156},g_{157}$ vanish at every weight at the old corners
+  c1, c2, c3 and at the continued points CC1, CC2, CC3;
+\item hence the choice $r=+\sqrt{|xyz|}$ versus $r=-\sqrt{|xyz|}$ changes only the overall sign
+  of $g_{156},g_{157}$; the other 369 masters are identical;
+\item the choice consistent with $\log x\to\log|x|+i\pi$, $\log y\to\log|y|+i\pi$ (the
+  continuation used for the CC boundaries) is
+  $r=\sqrt{x}\sqrt{y}\sqrt{z}=e^{i\pi}\sqrt{|xyz|}=-\sqrt{|xyz|}$.
+  It matters only when $g_{156},g_{157}$ are combined with quantities defined in the original
+  region (e.g.\ the prefactor $\sqrt{xyz}$ itself).
+\end{itemize}
+The letter expansions at CC2, CC3 (\texttt{cc\_series/letters/build\_cc\_letters.py}) use
+$r=-\sqrt{|xyz|}$ (default \texttt{--odd-sign -1}), consistent with the $+i\pi$ continuation of
+$\log x$ and $\log y$; \texttt{--odd-sign +1} gives the principal root.
+
+\paragraph{Where the sign comes from.} The radicand is positive at both ends of the
+continuation ($xyz>0$ for $x,y>0$ and for $x,y<0$, $z>1$), but negative in between (e.g.\ $x<0<y$),
+where $r$ is imaginary. Each crossing contributes $e^{\pm i\pi/2}$:
+$\sqrt{x}\to i\sqrt{|x|}$, $\sqrt{y}\to i\sqrt{|y|}$ for $\log x,\log y\to\log|\cdot|+i\pi$, so
+$r\to -\sqrt{|xyz|}$: a minus sign in front of the root, not under it. Opposite phases for $x$ and
+$y$ would give $+\sqrt{|xyz|}$.
+
+\end{document}

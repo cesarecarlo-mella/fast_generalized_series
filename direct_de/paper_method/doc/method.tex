@@ -1,0 +1,144 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[margin=2.3cm]{geometry}
+\usepackage{amsmath,amssymb,booktabs,graphicx,microtype}
+\usepackage[colorlinks=true,linkcolor=blue!50!black,citecolor=blue!50!black,urlcolor=blue!50!black]{hyperref}
+\newcommand{\eps}{\epsilon}
+\newcommand{\dlog}{\mathrm{d}\!\log}
+\title{Direct numerical solution of the canonical differential equation\\ for the family $H$ (Euclidean and continued region)}
+\author{implementation notes}
+\date{\today}
+\begin{document}
+\maketitle
+
+\section{Problem}
+The $N_f=371$ canonical master integrals $\vec J(x,y;\eps)$ of the family $H$ satisfy
+\begin{equation}
+  \mathrm d\vec J=\eps\,A\,\vec J,\qquad A=\sum_{k\in\mathcal A} a_k\,\dlog l_k(x,y),\qquad z\equiv 1-x-y ,
+\end{equation}
+with constant $371\times371$ matrices $a_k$ (\texttt{atilde.m}) and the 14 active letters
+$\mathcal A=\{1,\dots,13,16\}$:
+\begin{gather*}
+ l_1=x,\ l_2=y,\ l_3=z,\ l_4=1-x,\ l_5=1-y,\ l_6=x+y,\ l_9=1-(1+x)y,\ l_{10}=1-x(1+y),\\
+ l_{11}=x-y+y^2,\ l_{12}=-x+x^2+y,\ l_{13}=(1-x)^2-y,\ l_{16}=(1-y)^2-x,\\
+ l_7=\frac{xz-i r}{xz+i r},\qquad l_8=\frac{xy-i r}{xy+i r},\qquad r^2=b\equiv xyz .
+\end{gather*}
+The two odd letters contain the only square root.  Using $r^2=b$ (so $r\,\mathrm dr=\mathrm db/2$) their
+$\dlog$ is written with a single overall $1/r$:
+\begin{equation}\label{eq:odd}
+ \dlog\frac{a-ir}{a+ir}=\frac{i\,(2b\,\mathrm da-a\,\mathrm db)}{r\,(a^2+b)},\qquad a=xz\ (l_7),\quad a=xy\ (l_8).
+\end{equation}
+Writing $\vec J=\sum_{w\ge0}\eps^w\vec J^{(w)}$, the weight-0 part $\vec J^{(0)}$ is constant (\texttt{sol0.m})
+and $\mathrm d\vec J^{(w)}=A\,\vec J^{(w-1)}$.
+
+\section{The method of Czakon and Tancredi}
+We follow ref.~\cite{CT} exactly (sections 2 and 4 there).
+
+\paragraph{One system, square roots included.}
+The unknowns are the $\eps$-coefficients of weight $1,\dots,W$ and the square root, stacked into one vector
+\begin{equation}
+ F=\big(\vec J^{(1)},\dots,\vec J^{(W)},\,r\big)\in\mathbb C^{371W+1},
+\end{equation}
+which obeys the first-order (non-linear, through $r$) system
+\begin{equation}\label{eq:system}
+ \frac{\mathrm d\vec J^{(w)}}{\mathrm dt}=A_t(r)\,\vec J^{(w-1)}\quad(w=1,\dots,W),\qquad
+ \frac{\mathrm dr}{\mathrm dt}=\frac{r}{2b}\frac{\mathrm db}{\mathrm dt},
+\end{equation}
+where $A_t=\sum_k a_k\,\frac{\mathrm d}{\mathrm dt}\log l_k$ is the connection contracted with the tangent of the path,
+and eq.~\eqref{eq:odd} is evaluated with the \emph{current value of the component $r$}.  The square root is therefore never
+evaluated: its branch is fixed once, at the boundary point, and is then continued by the differential equation
+itself (eq.~(2.6) of \cite{CT}).  This is what makes the analytic continuation automatic.
+For $W=6$ the system has $2227$ components (for $W=2$: $743$).
+
+\paragraph{Path.}
+From the boundary point $\vec x_0$ to the target $\vec x_1$, along the complexified straight line (eq.~(4.1) of \cite{CT})
+\begin{equation}
+ z_k(t)=x_{0k}+\big(1+4i\delta_k(1-t)\big)\big(x_k(t)-x_{0k}\big),\qquad x(t)=x_0+t(x_1-x_0),\qquad t\in[0,1],
+\end{equation}
+with $\vec\delta=(0.1,0.2)$ (as in \cite{CT}).
+
+\paragraph{Integrator.}
+\texttt{boost::numeric::odeint::bulirsch\_stoer}: modified-midpoint steps with $n_k=2(k+1)$ sub-steps,
+Richardson extrapolation in $h^2$ up to order $k_{\max}=8$, adaptive step size and extrapolation order.
+The local-error estimate is the default of \cite{CT}: the maximal \emph{absolute} error of all components
+(\texttt{bulirsch\_stoer(eps\_abs = error, eps\_rel = 0)}), required to be $\le$ \texttt{error}.
+Floating-point types: \texttt{double} and \texttt{dd\_real} (double-double, $\simeq 32$ digits, QD library).
+Boost~1.83's \texttt{bulirsch\_stoer.hpp} does not compile with \texttt{dd\_real} (ambiguous
+\texttt{size\_t}$\to$\texttt{dd\_real} conversions); a local copy only adds explicit \texttt{double} casts of the
+integer sequences, the algorithm is unchanged.  Double-double arithmetic must be compiled without FMA contraction
+(\texttt{-ffp-contract=off}), otherwise the error-free transformations of QD break and the extrapolation never converges.
+
+\paragraph{Code.}
+\texttt{diffeqs.hpp} reproduces the interface of \cite{CT} (\texttt{diffeqs<Real>}, \texttt{connection\_t},
+\texttt{vector\_field\_t}, \texttt{path\_t}, boundary stream, \texttt{evaluate}, exceptions for max steps/evaluations/time and
+min step size).  \texttt{h\_family.cpp} supplies the connection (14 letters, the $a_k$ assembled on the union sparsity pattern,
+43\,410 non-zeros) and the vector field for $r$.  The matrix entries are read with 40 significant digits.
+
+\section{Boundary values}
+\subsection{Euclidean region: corner 1}
+The available boundary information are the shuffle-regularised constants $\vec c_w$ at the corner $x,y\to0$
+(coefficient of $\log^0x\log^0y$).  Near the corner
+\begin{equation}
+ \vec J^{(w)}=\sum_{a+b\le w}\log^a x\,\log^b y\;\vec C^{(w)}_{ab}(x,y),\qquad
+ \vec C^{(w)}_{ab}(0,0)=\frac{a_1^{\,a}\,a_2^{\,b}}{a!\,b!}\,\vec c_{w-a-b} ,
+\end{equation}
+($a_1,a_2$: matrices of the letters $x$, $y$; the other letters vanishing at the corner, $x+y$ and $x-y+\dots$,
+annihilate all $\vec C_{ab}(0,0)$).  On the ray $x=sX$, $y=sY$ the DE becomes
+$\mathrm d\vec J/\mathrm ds=\eps\,(R/s+\sum_{i\ge0}B_i s^i)\vec J$ with $R=\sum_k m_k a_k$ ($m_k$ the order of vanishing of
+$l_k$) and $B_i=\sum_k B_{k,i}\,a_k$, $B_{k,i}$ the Taylor coefficients of the regular part of $\partial_s\log l_k$.
+The solution is a log-power series
+\begin{equation}
+ \vec J^{(w)}(s)=\sum_{k=0}^{w}\log^k s\sum_{i=0}^{N}\vec P^{(w)}_{k,i}\,s^i ,
+\end{equation}
+obtained weight by weight: with $\vec G_{k,i}=\sum_q a_q\big(m_q\vec P^{(w-1)}_{k,i}+\sum_{j<i}B_{q,j}\vec P^{(w-1)}_{k,i-1-j}\big)$
+(the coefficient of $s^{i-1}\log^k s$ in $A_s\vec J^{(w-1)}$),
+\begin{equation}
+ \int\! s^{-1}\log^k s=\frac{\log^{k+1}s}{k+1},\qquad
+ \int\! s^{i-1}\log^k s=s^i\sum_{j=0}^{k}\frac{(-1)^j k!}{(k-j)!\,i^{j+1}}\log^{k-j}s\quad(i\ge1),
+\end{equation}
+and the integration constant fixed by the $s$-regularised ray constants
+\begin{equation}
+ \vec P^{(w)}_{0,0}\ \ni\ \vec c^{\,\rm ray}_w=\sum_{a+b\le w}\vec C^{(w)}_{ab}(0,0)\,\log^aX\,\log^bY .
+\end{equation}
+The ray constants are computed exactly (rational matrices times the constants $\pi,\zeta_3,\zeta_5,\dots$) and rounded
+to 36 digits; the $B_{k,i}$ are computed by exact power-series algebra at working precision
+($q'/q$ for the plain letters, eq.~\eqref{eq:odd} with $r=s\sqrt{XY}\sqrt{1-s(X+Y)}$ for the odd ones).
+We use $(X,Y)=(1,0.7)$, $s_0=0.1$, $N=60$ (truncation error far below $10^{-32}$), i.e.\ $\vec x_0=(0.1,0.07)$, and as an
+independent second start $(X,Y)=(0.4,1)$, $s_0=0.12$.  The boundary is produced in double-double
+(\texttt{frobenius.cpp}).  Against the exact weight-1,2 solution the boundary vectors agree to
+$\simeq10^{-26}$ ($w=1$) and $\simeq10^{-25}$ ($w=2$).
+(The earlier double-precision version of this step, with FFT-computed $B_{k,i}$, was only good to $10^{-9}$.)
+
+\subsection{Continued (scattering) region}
+The region $x,y<0$, $z>1$ is parametrised as $x=-w/v$, $y=-u/v$, $z=1/v$, $u+w+v=1$.  Its corner
+$u,w\to0$ (CC1) is the same corner approached from the negative quadrant.  The boundary constants
+$\vec c^{\,\rm CC1}_w$ (\texttt{transport.boundaries/H/dist/bdy\_CC1\_w*.m}) are the corner-1 data continued with
+$\log x\to\log w-\log(1-w-u)+i\pi$, $\log y\to\log u-\log(1-w-u)+i\pi$, and are regularised in $\log w,\log u$.
+Since $\log v=O(u,w)$, the same construction applies with $\vec c\to\vec c^{\,\rm CC1}$, a ray with $X,Y<0$, and
+$\log X,\log Y\to\log|X|,\log|Y|$.  The continuation $x\to x+i0$, $y\to y+i0$ (both phases $+\pi$) rotates $b=xyz$ by
+$2\pi$, hence
+\begin{equation}
+ r=-\sqrt{|xyz|}\qquad\text{in the continued region,}
+\end{equation}
+which is the only change in the series of the odd letters and in the boundary value of $r$.
+Starts: $(X,Y)=(-1,-0.7)$, $s_0=0.1$ and $(X,Y)=(-0.4,-1)$, $s_0=0.12$.
+
+\section{Validation}
+\paragraph{Exact weight $\le2$.}
+The exact solution through weight 2 is a combination of GPLs with letters $\{0,1\}$ in $y$ and $\{0,-y,1-y\}$ in $x$
+(no square roots).  In the continued region it is evaluated on the real negative axes with principal branches,
+$G(0;x)=\log|x|+i\pi$, i.e.\ $x+i0$, $y+i0$; the weight-2 GPLs with non-zero indices are computed by direct
+numerical integration along $[0,x]$, on which no index lies (this avoids spurious cuts of closed $\mathrm{Li}_2$ formulas).
+Digits are $-\log_{10}|J_{\rm num}-J_{\rm ex}|/|J_{\rm ex}|$ over the components with $|J_{\rm ex}|\ge10^{-4}$.
+
+\paragraph{Weights 3--6.}
+As recommended in \cite{CT}: integration from two different boundary points, and, for the continued region, from
+the Euclidean boundary along a path crossing $x=0$, $y=0$ above the origin (so that the system itself continues
+$r$ and the logarithms), which tests the transported CC1 constants independently.
+
+%RESULTS%
+
+\begin{thebibliography}{9}
+\bibitem{CT} M.~Czakon and L.~Tancredi, \emph{Solution of Canonical Differential Equations for Integrals on Arbitrary
+Geometries}, arXiv:2606.30354.
+\end{thebibliography}
+\end{document}
