@@ -28,6 +28,8 @@ ap.add_argument("--outdir", default="figures/paper")
 ap.add_argument("--mode", default="coverage")
 ap.add_argument("--cells-bottom", dest="smooth_bottom", action="store_false",
                 help="bottom row as flat cells (no interpolation) instead of the smooth map")
+ap.add_argument("--top-only", action="store_true",
+                help="only the top row (Bernoulli 19->20, min and median); writes *_bernoulli.pdf")
 a = ap.parse_args()
 
 # smooth bottom row: the per-point values are LINEARLY INTERPOLATED on the triangulation
@@ -60,7 +62,11 @@ f = lambda L, H: os.path.join(a.indir, "compare_%s_w6_ordp%d_ordb%d.m" % (m, L, 
 d1, d2 = P.load(f(18, 19)), P.load(f(19, 20))
 assert d1.shape == d2.shape and np.allclose(d1[:, :2], d2[:, :2]), "grids differ"
 
-fig, ax = plt.subplots(2, 2, figsize=(4.4, 4.4), gridspec_kw=dict(wspace=0.14, hspace=0.42))
+if a.top_only:
+    fig, ax1 = plt.subplots(1, 2, figsize=(4.4, 2.0), gridspec_kw=dict(wspace=0.14))
+    ax = np.array([ax1])
+else:
+    fig, ax = plt.subplots(2, 2, figsize=(4.4, 4.4), gridspec_kw=dict(wspace=0.14, hspace=0.42))
 # --- top: Bernoulli self-convergence 19 -> 20 (digits)
 for c, (col, stat) in enumerate(((6, "min over components"), (7, "median over components"))):
     P.panel(ax[0, c], d2, col, m, show_x=True, show_y=(c == 0))
@@ -73,6 +79,12 @@ cb.set_label("correct digits", color=P.INK)
 cb.outline.set_linewidth(0.5); cb.outline.set_edgecolor(P.EDGE)
 cb.ax.tick_params(width=0.5, length=2, colors=P.INK2, labelsize=7.5)
 
+if a.top_only:
+    base = os.path.join(a.outdir, "w6_selfconv_%s_bernoulli" % m)
+    fig.savefig(base + ".pdf", bbox_inches="tight")
+    print("  wrote", base + ".pdf")
+    raise SystemExit
+
 # --- bottom: change of MIN digits (19->20) - (18->19), native and Bernoulli
 for c, (col, rep) in enumerate(((4, r"native $(x,y,z)$"), (6, "Bernoulli"))):
     dv = np.nan_to_num(np.clip(d2[:, col], -2, 16) - np.clip(d1[:, col], -2, 16))
@@ -82,8 +94,9 @@ for c, (col, rep) in enumerate(((4, r"native $(x,y,z)$"), (6, "Bernoulli"))):
         P.fill(ax[1, c], d2, np.clip(dv, -7.99, 7.99), Dl.DCMAP, Dl.DNORM, Dl.DBOUNDS)
     Dl.decorate(ax[1, c], m, show_y=(c == 0))
     ax[1, c].set_title(rep, color=P.INK, pad=4, fontsize=9)
-    better, worse = np.mean(dv >= 0.1), np.mean(dv <= -0.1)
-    ax[1, c].text(0.98, 0.98, "$\\Delta>+0.1$: %d%%\n$|\\Delta|<0.1$: %d%%\n$\\Delta<-0.1$: %d%%"
+    # third line: strictly negative changes (none: the script asserts below that dv >= 0)
+    better, worse = np.mean(dv >= 0.1), np.mean(dv < 0)
+    ax[1, c].text(0.98, 0.98, "$\\Delta>+0.1$: %d%%\n$|\\Delta|<0.1$: %d%%\n$\\Delta<0$: %d%%"
                   % (round(100 * better), round(100 * (1 - better - worse)), round(100 * worse)),
                   transform=ax[1, c].transAxes, ha="right", va="top", fontsize=6.5, color=P.INK2)
     print("  %-9s improved %.1f%%  unchanged %.1f%%  worse %.1f%%  median %+.2f"

@@ -20,6 +20,7 @@ plots use the axes (u, w).
 
 ## Quick start
 
+    # step-by-step instructions for the T30 cluster: INSTRUCTIONS.md
     ./00_setup.sh          # build (~1 min) + points + boundaries + smoke test; on the login node
     ./slurm_submit.sh      # 2 regions x 2 precisions x NCHUNK array tasks, then the analysis job
     # ... or on a single machine:   NPAR=32 ./run_local.sh
